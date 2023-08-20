@@ -1,3 +1,0 @@
-C:/Users/omara/OneDrive/Desktop/XO_Level3-master/cmake-build-debug/CMakeFiles/2D_Arrray.dir
-C:/Users/omara/OneDrive/Desktop/XO_Level3-master/cmake-build-debug/CMakeFiles/edit_cache.dir
-C:/Users/omara/OneDrive/Desktop/XO_Level3-master/cmake-build-debug/CMakeFiles/rebuild_cache.dir
