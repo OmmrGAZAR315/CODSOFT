@@ -81,7 +81,7 @@ void printBoard(char element[3][3]) {
 
 bool checkWin(char element[3][3]) {
     for (int r = 0; r < 3; r++) {
-        if (element[r][0] == element[r][1] && element[r][1] == element[r][2] && element[r][0] != ' ') {
+        if (element[r][0] != ' '&&element[r][0] == element[r][1] && element[r][1] == element[r][2] ) {
             for (int i = 0; i < 3; i++)
                 element[r][i] = '-';
             return true;
@@ -99,7 +99,7 @@ bool checkWin(char element[3][3]) {
             element[i][i] = '\\';
         return true;
     }
-    if (element[2][0] != ' ' && element[0][2] == element[1][1] && element[1][1] == element[2][0]) {
+    if (element[0][2] != ' ' && element[0][2] == element[1][1] && element[1][1] == element[2][0]) {
         element[0][2] = '/';
         element[1][1] = '/';
         element[2][0] = '/';
