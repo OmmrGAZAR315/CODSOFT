@@ -88,18 +88,18 @@ bool checkWin(char element[3][3]) {
         }
     }
     for (int c = 0; c < 3; c++) {
-        if (element[0][c] == element[1][c] && element[1][c] == element[2][c] && element[0][c] != ' ') {
+        if (element[0][c] != ' '&&element[0][c] == element[1][c] && element[1][c] == element[2][c]) {
             for (int i = 0; i < 3; i++)
                 element[i][c] = '|';
             return true;
         }
     }
-    if (element[0][0] == element[1][1] && element[1][1] == element[2][2] && element[0][0] != ' ') {
+    if ( element[0][0] != ' '&&element[0][0] == element[1][1] && element[1][1] == element[2][2]) {
         for (int i = 0; i < 3; ++i)
             element[i][i] = '\\';
         return true;
     }
-    if (element[0][2] == element[1][1] && element[1][1] == element[2][0] && element[2][2] != ' ') {
+    if (element[2][0] != ' ' && element[0][2] == element[1][1] && element[1][1] == element[2][0]) {
         element[0][2] = '/';
         element[1][1] = '/';
         element[2][0] = '/';
