@@ -1,4 +1,5 @@
 #include <iostream>
+#include <iomanip>
 #include "vector"
 #include "algorithm"
 
@@ -8,72 +9,103 @@ void getOperator(string &, string &, string &, char &);
 
 double getOperand(string &, string &, string &, bool);
 
-vector<short> equationsOperators;
+void inputAgain(string &bigInput, string &total);
+
+vector<long long> equationsOperators;
 char allOperators[] = {'*', '/', '+', '-'};
 char operators1[] = {'*', '+'};
 char operators2[] = {'/', '-'};
 
 int main() {
-    string bigInput, backUpInput, firstOperand, secOperand, total, replacedStr;
-    char operatR;
-    size_t operatorPos = 0;
-    int selectEquationLength = 0;
-    cout << "CALCULATOR\n\n";
+    string bigInput, backUpInput, firstOperand, lastOperand, secOperand, total, replacedStr;
+    char operatR, lastOperator;
+    size_t operatorPos;
+    int selectEquationLength;
+    cout << "Advanced Calculator\n\n";
     cout << "ex:-5*3+12/2-1 (enter)\n";
-    cout << "Answer:-5*3+12/2-1=-10\n\n";
+    cout << "Answer:-5*3+12/2-1=-10\n";
+    cout << "+10-20\n";
+    cout << "enter an equation to continue\nor enter to do last operation\nor n to exit\n";
+    cout << "Answer:-10+10-20=-20\n\n";
+    c:
     cout << "Input:";
     getline(cin, bigInput);
-    backUpInput = bigInput;
+    do {
+        backUpInput = bigInput;
+        if (backUpInput[0] == '-')
+            backUpInput.replace(0, 0, "0");
 
-    if (backUpInput[0] == '-')
-        backUpInput.replace(0, 0, "0");
-
-
-    for (int i = 0; i < backUpInput.length(); i++) {
-        for (char oneOperator: allOperators) {
-            operatorPos = backUpInput.find(oneOperator);
+        for (int i = 0; i < backUpInput.length(); i++) {
+            for (char oneOperator: allOperators) {
+                operatorPos = backUpInput.find(oneOperator);
+                if (operatorPos != string::npos) {
+                    backUpInput.replace(operatorPos, 1, "o");
+                    break;
+                }
+            }
             if (operatorPos != string::npos) {
-                backUpInput.replace(operatorPos, 1, "o");
-                break;
+                equationsOperators.push_back(operatorPos);
             }
         }
-        if (operatorPos != string::npos) {
-            equationsOperators.push_back(operatorPos);
+        backUpInput = bigInput;
+
+
+        if (backUpInput[0] == '-')
+            backUpInput.replace(0, 0, "0");
+
+        sort(equationsOperators.begin(), equationsOperators.end());
+        int x = equationsOperators.size();
+        int k = 0;
+        lastOperand = backUpInput.substr(equationsOperators.back(), backUpInput.size() - 1);
+        lastOperator = lastOperand[0];
+        lastOperand.replace(0, 1, "");
+        while (k < x) {
+            getOperand(backUpInput, firstOperand, secOperand, false);
+            int i = getOperand(backUpInput, firstOperand, secOperand, true);
+            operatR = backUpInput[equationsOperators[i]];
+            if (i == 0)
+                operatorPos = -1;
+            else
+                operatorPos = equationsOperators[i - 1];
+            selectEquationLength = (firstOperand + secOperand).size() + 1;
+            getOperator(firstOperand, secOperand, total, operatR);
+
+            equationsOperators.erase(equationsOperators.begin() + i);
+            for (; i < equationsOperators.size(); i++)
+                equationsOperators[i] -= selectEquationLength - total.length();
+            backUpInput.replace(operatorPos + 1, selectEquationLength, total);
+
+//            printf("%.2f %c %.2f = %.2f\n", stold(firstOperand), operatR, stold(secOperand), stold(total));
+            k++;
         }
-    }
-
-    backUpInput = bigInput;
-
-    if (backUpInput[0] == '-')
-        backUpInput.replace(0, 0, "0");
-
-    sort(equationsOperators.begin(), equationsOperators.end());
-    int x = equationsOperators.size();
-    int k = 0;
+        cout << endl << "Answer: " << bigInput << " = ";
+        printf("%.2Lf\n", stold(total));
 
 
-    while (k < x) {
-        getOperand(backUpInput, firstOperand, secOperand, false);
-        int i = getOperand(backUpInput, firstOperand, secOperand, true);
-        operatR = backUpInput[equationsOperators[i]];
-        if (i == 0)
-            operatorPos = -1;
-        else
-            operatorPos = equationsOperators[i - 1];
-        selectEquationLength = (firstOperand + secOperand).size() + 1;
+        try {
 
-        getOperator(firstOperand, secOperand, total, operatR);
-        equationsOperators.erase(equationsOperators.begin() + i);
-        for (; i < equationsOperators.size(); i++)
-            equationsOperators[i] -= selectEquationLength - total.length();
-        backUpInput.replace(operatorPos + 1, selectEquationLength, total);
+            bigInput = total;
+        } catch (const std::runtime_error &e) {
+            cerr << "Math Error " << e.what() << "\n";
+            secOperand.clear();
+            operatR = '\0';
+        }
+        getline(cin, total);
 
-        printf("%.2f %c %.2f = %.2f\n", stod(firstOperand), operatR, stod(secOperand), stod(total));
-        k++;
-    }
-    cout << endl << "Answer: " << bigInput << " = ";
-    printf("%.2f\n", stod(total));
+        if (total.empty()) {
+            ostringstream stream;
+            stream << fixed << setprecision(2) << stold(lastOperand);
+            total = lastOperator + stream.str();
 
+        }
+        if (tolower(total[0]) == 'c')
+            goto c;
+        else inputAgain(bigInput, total);
+    } while (!total.empty());
+
+
+//    cin.get();
+    return 0;
 }
 
 
@@ -128,19 +160,53 @@ getOperand(string &backUpInput, string &firstOperand, string &secOperand, bool s
 }
 
 void getOperator(string &firstOperand, string &secOperand, string &total, char &operatR) {
+    ostringstream stream;
+    stream << fixed << setprecision(2);
     switch (operatR) {
         case '+':
-            total = to_string(stod(firstOperand) + stod(secOperand));
+            stream << (stold(firstOperand) + stold(secOperand));
+            total = stream.str();
             break;
         case '-':
-            total = to_string(stod(firstOperand) - stod(secOperand));
+            stream << (stold(firstOperand) - stold(secOperand));
+            total = stream.str();
             break;
         case '*':
-            total = to_string(stod(firstOperand) * stod(secOperand));
+            stream << (stold(firstOperand) * stold(secOperand));
+            total = stream.str();
             break;
         case '/':
-            total = to_string(stod(firstOperand) / stod(secOperand));
+            stream << (stold(firstOperand) / stold(secOperand));
+            total = stream.str();
             break;
     }
 }
 
+void inputAgain(string &bigInput, string &total) {
+    if (tolower(total[0]) == 'n')
+        total.clear();
+    else {
+        int i, k;
+        int firstOperator;
+        bool userError = true;
+        for (i = 0; i < total.size(); i++) {
+            for (k = 0; k < 4; k++)
+                if (total[i] == allOperators[k]) {
+                    firstOperator = i;
+                    break;
+                }
+            if (total[i] == allOperators[k])
+                break;
+        }
+
+
+        for (char oneOperator: allOperators)
+            if (total[0] == oneOperator)
+                userError = false;
+
+        if (userError)
+            total.replace(0, firstOperator, "");
+
+        bigInput += total;
+    }
+}
