@@ -9,7 +9,7 @@ void getOperator(string &, string &, string &, char &);
 
 double getOperand(string &, string &, string &, bool);
 
-void inputAgain(string &bigInput, string &total);
+inline void inputAgain(string &bigInput, string &total);
 
 vector<long long> equationsOperators;
 char allOperators[] = {'*', '/', '+', '-'};
@@ -22,10 +22,13 @@ int main() {
     size_t operatorPos;
     int selectEquationLength;
     cout << "Advanced Calculator\n\n";
-    cout << "ex:-5*3+12/2-1 (enter)\n";
+    cout << "ex:-5*3+12/2-1\n\n";
+    cout << "Enter an Equation: Input a mathematical equation to proceed on previous result.\n"
+            "Press 'Enter': Use this to repeat the previous operation.\n"
+            "Press 'C': Use this to clear the input or any previous calculations.\n"
+            "Press 'N': Use this to exit the program.";
     cout << "Answer:-5*3+12/2-1=-10\n";
-    cout << "+10-20\n";
-    cout << "enter an equation to continue\nor enter to do last operation\nor n to exit\n";
+    cout << "Input:+10-20\n";
     cout << "Answer:-10+10-20=-20\n\n";
     c:
     cout << "Input:";
@@ -59,52 +62,50 @@ int main() {
         lastOperand = backUpInput.substr(equationsOperators.back(), backUpInput.size() - 1);
         lastOperator = lastOperand[0];
         lastOperand.replace(0, 1, "");
-        while (k < x) {
-            getOperand(backUpInput, firstOperand, secOperand, false);
-            int i = getOperand(backUpInput, firstOperand, secOperand, true);
-            operatR = backUpInput[equationsOperators[i]];
-            if (i == 0)
-                operatorPos = -1;
-            else
-                operatorPos = equationsOperators[i - 1];
-            selectEquationLength = (firstOperand + secOperand).size() + 1;
-            getOperator(firstOperand, secOperand, total, operatR);
-
-            equationsOperators.erase(equationsOperators.begin() + i);
-            for (; i < equationsOperators.size(); i++)
-                equationsOperators[i] -= selectEquationLength - total.length();
-            backUpInput.replace(operatorPos + 1, selectEquationLength, total);
-
-//            printf("%.2f %c %.2f = %.2f\n", stold(firstOperand), operatR, stold(secOperand), stold(total));
-            k++;
-        }
-        cout << endl << "Answer: " << bigInput << " = ";
-        printf("%.2Lf\n", stold(total));
-
-
         try {
+            while (k < x) {
+                getOperand(backUpInput, firstOperand, secOperand, false);
+                int i = getOperand(backUpInput, firstOperand, secOperand, true);
+                operatR = backUpInput[equationsOperators[i]];
+                if (i == 0)
+                    operatorPos = -1;
+                else
+                    operatorPos = equationsOperators[i - 1];
+                selectEquationLength = (firstOperand + secOperand).size() + 1;
+                getOperator(firstOperand, secOperand, total, operatR);
+
+                equationsOperators.erase(equationsOperators.begin() + i);
+                for (; i < equationsOperators.size(); i++)
+                    equationsOperators[i] -= selectEquationLength - total.length();
+                backUpInput.replace(operatorPos + 1, selectEquationLength, total);
+
+                k++;
+            }
+
+            cout << endl << "Answer: " << bigInput << " = ";
+            printf("%.2Lf\n", stold(total));
+            cout << "Input:";
+
 
             bigInput = total;
-        } catch (const std::runtime_error &e) {
-            cerr << "Math Error " << e.what() << "\n";
-            secOperand.clear();
-            operatR = '\0';
-        }
-        getline(cin, total);
+            getline(cin, total);
 
-        if (total.empty()) {
-            ostringstream stream;
-            stream << fixed << setprecision(2) << stold(lastOperand);
-            total = lastOperator + stream.str();
+            if (total.empty()) {
+                ostringstream stream;
+                stream << fixed << setprecision(2) << stold(lastOperand);
+                total = lastOperator + stream.str();
+
+            }
+            if (tolower(total[0]) == 'c')
+                goto c;
+            else inputAgain(bigInput, total);
+        } catch (...) {
+            cerr << "Math Error " << "\n";
+            exit(0);
 
         }
-        if (tolower(total[0]) == 'c')
-            goto c;
-        else inputAgain(bigInput, total);
     } while (!total.empty());
 
-
-//    cin.get();
     return 0;
 }
 
@@ -189,6 +190,7 @@ void inputAgain(string &bigInput, string &total) {
         int i, k;
         int firstOperator;
         bool userError = true;
+        //fixing not writing an operator by mistake
         for (i = 0; i < total.size(); i++) {
             for (k = 0; k < 4; k++)
                 if (total[i] == allOperators[k]) {
