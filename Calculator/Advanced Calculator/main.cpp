@@ -33,6 +33,8 @@ int main() {
     c:
     cout << "Input:";
     getline(cin, bigInput);
+        if(tolower(bigInput[0])=='n')
+        exit(0);
     do {
         backUpInput = bigInput;
         if (backUpInput[0] == '-')
